@@ -67,7 +67,7 @@ parking_lot = { version = "0.12.5", features = ["hardware-lock-elision"] }
 anyhow = "1.0.104"
 chrono = "0.4.45"
 criterion = { version = "0.8.2", features = ["async_tokio"] }
-tokio = { version = "1.53.3", features = [
+tokio = { version = "1.54.0", features = [
   "rt-multi-thread",
   "macros",
   "time",
