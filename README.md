@@ -1,16 +1,16 @@
 <h1 align="center">
   <img src="./src-tauri/icons/icon.png" alt="Clash" width="128" />
   <br>
-  Continuation of <a href="https://github.com/zzzgydi/clash-verge">Clash Verge</a>
+  Clash Verge IP 质量增强版
   <br>
 </h1>
 
 <h3 align="center">
-A Clash Meta GUI based on <a href="https://github.com/tauri-apps/tauri">Tauri</a>.
+由 caaaptaintop 维护的 IP 质量增强 fork，基于 <a href="https://github.com/tauri-apps/tauri">Tauri</a> 与 Mihomo。
 </h3>
 
 <p align="center">
-  Languages:
+  语言参考（本 fork 的增强功能与下载说明以本页中文为准）：
   <a href="./docs/README_en.md">English</a> ·
   <a href="./docs/README_es.md">Español</a> ·
   <a href="./docs/README_fa.md">فارسی</a> ·
@@ -21,30 +21,59 @@ A Clash Meta GUI based on <a href="https://github.com/tauri-apps/tauri">Tauri</a
   <a href="./README.md">简体中文</a>
 </p>
 
-## Preview
+本项目由 [caaaptaintop](https://github.com/caaaptaintop/clash-verge-rev) 维护，来源于 [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)，以其稳定版 **v2.5.8** 为基线，维护分支为 **`feat/ip-quality`**。主要新增逐节点 IP 质量检测与展示；本 fork 与上游独立发布。
 
-| Dark                             | Light                             |
-| -------------------------------- | --------------------------------- |
+## 下载与安装
+
+**增强版请从[本 fork 的 Releases](https://github.com/caaaptaintop/clash-verge-rev/releases) 下载。** 上游发布的安装包不包含本 fork 的 IP 质量增强功能。
+
+当前增强版发行版本：[`v2.5.8-ipquality.1`](https://github.com/caaaptaintop/clash-verge-rev/releases/tag/v2.5.8-ipquality.1)，仅提供 **macOS Apple Silicon（arm64）** 安装包：
+
+`Clash.Verge.IP.Quality_2.5.8-ipquality.1_macos_arm64.dmg`
+
+请以发布页实际附件为准。Intel Mac、Windows 和 Linux 当前未提供、未验收增强版安装包。上游的多平台支持范围不代表本 fork 已有相应增强包。
+
+### 安装与更新
+
+1. 安装前自行备份已有配置。本 App 保留上游的应用标识（bundle id）和数据目录，可能覆盖已安装的上游 App，并共用原有配置。
+2. 打开 DMG，将 App 拖入 **Applications（应用程序）**。
+3. 本包使用本地 **ad hoc 签名**，未经 Apple Developer ID 签名或公证，macOS Gatekeeper 可能拦截。请先核对下载来源，并按系统提示决定是否允许打开。
+
+本 fork 版本请从[本 fork 的 Releases](https://github.com/caaaptaintop/clash-verge-rev/releases) **手动下载更新**。当前内置更新入口仍指向上游；安装其提供的上游更新会覆盖本分支的定制功能。
+
+### macOS 菜单栏图标排查
+
+特定机器曾出现菜单栏图标隐藏，与从 AI 应用或终端启动后保留的旧宿主关联有关。若图标缺失，请保留现有代理运行，检查系统“菜单栏”中的应用及对应启动宿主显示开关，并检查 Thaw / Ice 的隐藏区与布局。日常请通过 Finder 或 Dock 启动 App。
+
+## IP 质量增强功能
+
+- **逐节点评分**：通过 IPPure 获取受测节点出口 IP 的 **0–100 风险分，越低越好**；普通卡片和 mini 卡片均显示分数、六档色带及属性，悬停可查看出口 IP、国家/地区、ASN、机构、检测时间与来源。
+- **独立属性**：住宅 / 非住宅与原生 / 广播是 IPPure 返回的两类独立分类；非住宅不等于机房。“原生”对应 `isBroadcast=false`，“广播”对应 `isBroadcast=true`，字段缺失显示未知，不是本 App 的额外鉴定。
+- **刷新入口**：点击代理组的“IP质量”按钮可批量刷新本组实际节点；单节点或批量延迟测速也会附带触发质量检测。组成员若是代理组，检测其当前选中的实际节点；直连、拒绝等预设项不参与。
+- **独立检测链路**：检测启动独立的 Mihomo 子内核，不切换日常代理内核选中的节点。检测失败或缺少评分时显示失败 / 未知；若保留上次结果，会明确标注并显示上次检测时间。
+
+| IP 风险分 | 等级 | 颜色 |
+| :--- | :--- | :--- |
+| 0–15 | 极度纯净 | 深绿 |
+| >15–25 | 纯净 | 绿色 |
+| >25–40 | 中性 | 黄绿色 |
+| >40–50 | 轻度风险 | 黄色 |
+| >50–70 | 中度风险 | 橙色 |
+| >70–100 | 极度风险 | 红色 |
+
+评分是第三方提供的参考信息，不是节点可用性、速度、匿名性或特定网站 / 服务可访问性的承诺。检测会经受测节点请求 `my.ippure.com`，第三方服务因此能看到该节点的出口 IP；新增检测请求不上传订阅内容或节点凭据，详见下方隐私说明。
+
+## 上游界面预览
+
+以下为上游界面示意，未展示本 fork 新增的 IP 质量信息。
+
+| 深色模式 | 浅色模式 |
+| --- | --- |
 | ![预览](./docs/preview_dark.png) | ![预览](./docs/preview_light.png) |
 
-## Install
+通用安装说明和常见问题可参考[上游文档](https://clash-verge-rev.github.io/)，其中下载与更新说明不适用于本 fork 增强包。
 
-请到发布页面下载对应的安装包：[Release page](https://github.com/clash-verge-rev/clash-verge-rev/releases)<br>
-Go to the [Release page](https://github.com/clash-verge-rev/clash-verge-rev/releases) to download the corresponding installation package<br>
-Supports Windows (x64/x86), Linux (x64/arm64) and macOS 11+ (intel/apple).
-支持 Windows (x64/x86)、Linux (x64/arm64) 和 macOS 11+ (intel/apple)。
-
-#### 我应当怎样选择发行版
-
-| 版本        | 特征                                     | 链接                                                                                   |
-| :---------- | :--------------------------------------- | :------------------------------------------------------------------------------------- |
-| Stable      | 正式版，高可靠性，适合日常使用。         | [Release](https://github.com/clash-verge-rev/clash-verge-rev/releases)                 |
-| Alpha(废弃) | 测试发布流程。                           | [Alpha](https://github.com/clash-verge-rev/clash-verge-rev/releases/tag/alpha)         |
-| AutoBuild   | 滚动更新版，适合测试反馈，可能存在缺陷。 | [AutoBuild](https://github.com/clash-verge-rev/clash-verge-rev/releases/tag/autobuild) |
-
-#### 安装说明和常见问题，请到 [文档页](https://clash-verge-rev.github.io/) 查看
-
-### TG 频道: [@clash_verge_rev](https://t.me/clash_verge_re)
+### 上游 TG 频道：[@clash_verge_rev](https://t.me/clash_verge_re)
 
 ---
 
@@ -78,7 +107,7 @@ Supports Windows (x64/x86), Linux (x64/arm64) and macOS 11+ (intel/apple).
 
 ---
 
-## Features
+## 上游基础功能
 
 - 基于性能强劲的 Rust 和 Tauri 2 框架
 - 内置[Clash.Meta(mihomo)](https://github.com/MetaCubeX/mihomo)内核，并支持切换 `Alpha` 版本内核。
@@ -88,11 +117,11 @@ Supports Windows (x64/x86), Linux (x64/arm64) and macOS 11+ (intel/apple).
 - 可视化节点和规则编辑
 - WebDav 配置备份和同步
 
-### FAQ
+### 常见问题
 
-Refer to [Doc FAQ Page](https://clash-verge-rev.github.io/faq/windows.html)
+参考[上游常见问题](https://clash-verge-rev.github.io/faq/windows.html)（该链接为 Windows 专题，不代表本 fork 提供 Windows 增强包）。
 
-### Donation
+### 支持上游开发
 
 [捐助Clash Verge Rev的开发](https://github.com/sponsors/clash-verge-rev)
 
@@ -129,13 +158,12 @@ Clash Verge rev was based on or inspired by these projects and so on:
 - [Fndroid/clash_for_windows_pkg](https://github.com/Fndroid/clash_for_windows_pkg): A Windows/macOS GUI based on Clash.
 - [vitejs/vite](https://github.com/vitejs/vite): Next generation frontend tooling. It's fast!
 
-## Privacy
+## 隐私
 
-Clash Verge Rev 不收集任何用户数据，配置与日志仅保存在本地。详见[隐私政策](./PRIVACY.md)。
+配置与日志保存在本地；本增强版的网络请求说明见[隐私政策](./PRIVACY.md)。本 fork 新增的 IP 质量检测会在点击“IP质量”刷新或进行节点测速时，通过受测节点向 **`https://my.ippure.com/v1/info`** 发起第三方请求。IPPure 能看到受测节点的出口 IP 及请求元数据，并按其自身政策处理这些信息；本 App 无法保证第三方不记录请求。
 
-Clash Verge Rev does not collect any user data; configuration and logs stay on
-your own device. See the [Privacy Policy](./PRIVACY.md) for details.
+新增检测逻辑在本地读取配置以建立独立检测链路，向 IPPure 发出的请求不上传订阅内容、订阅地址或节点凭据。检测结果中的出口 IP、风险分和属性会显示在界面上；缺失或失败不会被当成低风险。因此，上游“不收集用户数据”的描述不能被理解为本增强版不会向第三方发起网络请求。
 
-## License
+## 许可证
 
-GPL-3.0 License. See [License here](./LICENSE) for details.
+沿用 GPL-3.0 许可证，详见 [LICENSE](./LICENSE)。

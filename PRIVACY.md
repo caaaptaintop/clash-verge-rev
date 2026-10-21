@@ -2,9 +2,11 @@
 
 **Applies to:** the Clash Verge Rev desktop application for Windows, macOS and
 Linux, distributed from
-<https://github.com/clash-verge-rev/clash-verge-rev/releases>.
+<https://github.com/caaaptaintop/clash-verge-rev/releases>. This IP quality fork
+is based on Clash Verge Rev v2.5.8; the additional connection is described in
+Section 4.11.
 
-**Last updated:** 2026-09-09
+**Last updated:** 2026-10-21
 
 Clash Verge Rev is a free and open-source graphical client for the
 [mihomo](https://github.com/MetaCubeX/mihomo) proxy core, maintained by
@@ -23,15 +25,19 @@ server of its own that the application talks to.
 - The application connects only to endpoints that you configure (proxy servers,
   subscription URLs, backup server) or to the third-party services listed in
   Section 4. None of them are operated by this project.
-- Two connections are enabled by default and are not part of your own proxy
-  configuration: the **application update check** (Section 4.3) and the **IP
+- The upstream application enables two connections by default outside your own
+  proxy configuration: the **application update check** (Section 4.3) and the **IP
   information card** on the Home page (Section 4.5). Both are described below,
   and Section 6 explains how to turn them off.
+- This fork also queries IPPure through the node being tested when the proxy
+  interface requests an IP quality check, including checks triggered by latency
+  tests. IPPure receives that node's exit IP and ordinary HTTPS request metadata
+  (Section 4.11).
 
 ## 2. Who is responsible
 
-The Clash Verge Rev maintainers, reachable through the project's issue tracker
-at <https://github.com/clash-verge-rev/clash-verge-rev/issues>. Because the
+The IP quality fork maintainer, reachable through the fork's issue tracker
+at <https://github.com/caaaptaintop/clash-verge-rev/issues>. Because the
 application performs no data collection, there is no data controller
 relationship, no processing agreement, and no data to request or erase from us.
 
@@ -160,6 +166,26 @@ The proxy ports and the internal control port bind to `127.0.0.1` only. They are
 not exposed to your network unless you deliberately configure the core to allow
 LAN access.
 
+### 4.11 Per-node IP quality checks — IP quality fork
+
+The proxy interface obtains IP risk and network attributes from
+`https://my.ippure.com/v1/info` through the node being tested. Checks can be
+requested by the node quality interface, a quality refresh, or a latency test.
+Each check uses a temporary local mihomo process and does not switch the
+application's selected daily proxy.
+
+IPPure can observe the tested node's public exit IP and ordinary HTTPS request
+metadata. The request does not upload subscription URLs, proxy credentials,
+profile files or application logs to IPPure. IPPure is an independent third
+party; its own data handling policies apply. The risk score and network
+attributes are returned by that service and are informational.
+
+Proxy definitions needed to establish the test connection are written to a
+temporary local configuration. The check process and temporary files are
+cleaned up after completion. A failed or unsupported check is not interpreted
+as low risk. Without an earlier result it is shown as unknown; a retained
+earlier result is marked as such with its original check time.
+
 ## 5. Third-party components and services
 
 The application bundles or depends on software with its own behaviour and
@@ -188,6 +214,9 @@ policies:
   at any time.
 - The IP information card only queries while the Home page is visible
   (Section 4.5).
+- Per-node IP quality checks use IPPure when the proxy interface requests them,
+  including checks attached to latency testing (Section 4.11). The Home-page IP
+  card and its controls do not control these separate checks.
 - Everything else is a plain file on your disk: delete the application data
   directory to remove all stored data.
 
@@ -204,5 +233,5 @@ history. The date at the top reflects the most recent change.
 ## 9. Contact
 
 Open an issue at
-<https://github.com/clash-verge-rev/clash-verge-rev/issues>. Please do not
+<https://github.com/caaaptaintop/clash-verge-rev/issues>. Please do not
 include logs or configuration files containing credentials in public issues.
