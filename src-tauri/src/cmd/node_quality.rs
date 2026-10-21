@@ -18,7 +18,7 @@ use std::{
     collections::HashSet,
     fs,
     net::{IpAddr, TcpListener},
-    path::PathBuf,
+    path::{Path, PathBuf},
     process::Stdio,
     sync::LazyLock,
     time::Duration,
@@ -393,6 +393,45 @@ fn isolate_environment(command: &mut Command) {
     command.env_clear().env("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
 }
 
+fn probe_command(binary: &Path, directory: &Path, config: &Path) -> Command {
+    #[cfg(target_os = "macos")]
+    let mut command = {
+        // The pipe closes even when the GUI is killed. This supervisor then reaps
+        // its private core and removes its configuration without touching daily cores.
+        let mut command = Command::new("/bin/sh");
+        command
+            .arg("-c")
+            .arg(concat!(
+                "directory=$1; shift\n",
+                "\"$@\" < /dev/null &\n",
+                "probe=$!\n",
+                "trap 'kill -KILL %1 2>/dev/null; wait \"$probe\" 2>/dev/null; /bin/rm -rf -- \"$directory\"' EXIT\n",
+                "trap 'exit' HUP INT TERM\n",
+                "read -r finished\n"
+            ))
+            .arg("verge-quality-supervisor")
+            .arg(directory)
+            .arg(binary);
+        command.stdin(Stdio::piped());
+        command
+    };
+    #[cfg(not(target_os = "macos"))]
+    let mut command = {
+        let mut command = Command::new(binary);
+        command.stdin(Stdio::null()).kill_on_drop(true);
+        command
+    };
+    isolate_environment(&mut command);
+    command
+        .arg("-d")
+        .arg(directory)
+        .arg("-f")
+        .arg(config)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
+    command
+}
+
 fn validate_provider_target(provider: &Json, name: &str) -> Result<()> {
     let matching = provider["proxies"]
         .as_array()
@@ -434,18 +473,7 @@ async fn run_probe(snapshot: &Snapshot, record_id: &str) -> Result<NodeQualityRe
     ensure!(binary.is_file(), "找不到独立检测内核");
     drop(proxy_socket);
     drop(control_socket);
-    // This child owns only its private directory and authenticated loopback listeners.
-    let mut command = Command::new(binary);
-    isolate_environment(&mut command);
-    let mut child = command
-        .args(["-d"])
-        .arg(&directory.0)
-        .arg("-f")
-        .arg(&config_path)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .kill_on_drop(true)
+    let mut child = probe_command(&binary, &directory.0, &config_path)
         .spawn()
         .context("无法启动独立检测内核")?;
     let result = async {
@@ -544,6 +572,9 @@ async fn run_probe(snapshot: &Snapshot, record_id: &str) -> Result<NodeQualityRe
     }
     .await;
     // Reap before the directory is removed, also after every failure path.
+    #[cfg(target_os = "macos")]
+    drop(child.stdin.take());
+    #[cfg(not(target_os = "macos"))]
     let _ = child.kill().await;
     let _ = child.wait().await;
     result
@@ -676,6 +707,49 @@ mod tests {
         snapshot.view.groups[0].now = None;
         assert!(check_dialer_dependencies(&snapshot, &serde_yaml_ng::from_str("dialer-proxy: Auto")?).is_err());
         assert!(check_dialer_dependencies(&snapshot, &serde_yaml_ng::from_str("dialer-proxy: missing")?).is_err());
+        Ok(())
+    }
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn closing_parent_pipe_reaps_probe_and_private_config() -> Result<()> {
+        use std::os::unix::fs::PermissionsExt as _;
+        let directory = ProbeDirectory::new()?;
+        let binary = directory.0.join("fixture core");
+        fs::write(
+            &binary,
+            "#!/bin/sh\nprintf '%s' \"$$\" > \"$2/probe.pid\"\nexec /bin/sleep 60\n",
+        )?;
+        fs::set_permissions(&binary, fs::Permissions::from_mode(0o700))?;
+        let mut child = probe_command(&binary, &directory.0, &directory.0.join("config.yaml")).spawn()?;
+        let pid_path = directory.0.join("probe.pid");
+        let pid = tokio::time::timeout(Duration::from_secs(2), async {
+            loop {
+                if let Ok(pid) = fs::read_to_string(&pid_path)
+                    && let Ok(pid) = pid.parse::<i32>()
+                {
+                    break pid;
+                }
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
+        })
+        .await?;
+        drop(child.stdin.take());
+        tokio::time::timeout(Duration::from_secs(2), child.wait()).await??;
+        // SAFETY: signal zero only checks existence of this fixture's process.
+        assert_eq!(unsafe { libc::kill(pid, 0) }, -1);
+        assert!(!directory.0.exists());
+        Ok(())
+    }
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn supervisor_never_signals_a_completed_job_by_stale_pid() -> Result<()> {
+        let output = Command::new("/bin/sh")
+            .args(["-c", "true & probe=$!; sleep .1; kill -KILL %1 2>/dev/null; result=$?; wait \"$probe\"; test \"$result\" != 0"])
+            .output()
+            .await?;
+        assert!(output.status.success());
         Ok(())
     }
 
