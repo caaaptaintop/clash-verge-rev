@@ -781,7 +781,7 @@ mod tests {
     #[test]
     fn duplicate_provider_names_and_direct_aliases_are_rejected_before_request() {
         let node = serde_json::json!({"name":"same-name", "type":"Shadowsocks"});
-        assert!(validate_provider_target(&serde_json::json!({"proxies":[node.clone()]}), "same-name").is_ok());
+        assert!(validate_provider_target(&serde_json::json!({"proxies":[node]}), "same-name").is_ok());
         assert!(validate_provider_target(&serde_json::json!({"proxies":[node.clone(),node]}), "same-name").is_err());
         assert!(
             validate_provider_target(
