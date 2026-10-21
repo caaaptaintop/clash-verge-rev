@@ -21,6 +21,8 @@ import {
   type ResolvedProxyMember,
 } from '@/types/proxy-view'
 
+import { NodeQuality } from './node-quality'
+
 interface Props {
   group: ProxyGroupView
   member: ResolvedProxyMember
@@ -92,12 +94,14 @@ export const ProxyItem = (props: Props) => {
               },
               backgroundColor: bgcolor,
               marginBottom: '8px',
-              height: '40px',
+              minHeight: '136px',
             }
           },
         ]}
       >
         <ListItemText
+          sx={{ minWidth: 0 }}
+          slotProps={{ secondary: { component: 'div' } }}
           title={name}
           secondary={
             <>
@@ -128,6 +132,7 @@ export const ProxyItem = (props: Props) => {
               {!unresolved && showType && details?.smux && (
                 <TypeBox>SMUX</TypeBox>
               )}
+              <NodeQuality member={member} />
             </>
           }
         />
@@ -135,6 +140,7 @@ export const ProxyItem = (props: Props) => {
         <ListItemIcon
           sx={{
             justifyContent: 'flex-end',
+            flexShrink: 0,
             color: 'primary.main',
             display: isPreset ? 'none' : '',
           }}

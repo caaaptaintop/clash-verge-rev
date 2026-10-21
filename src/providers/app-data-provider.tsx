@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import {
   getBaseConfig,
   getRuleProviders,
@@ -6,10 +6,12 @@ import {
 } from 'tauri-plugin-mihomo-api'
 
 import { useClashInfo, useRuntimeConfig } from '@/hooks/use-clash'
+import { useProfiles } from '@/hooks/use-profiles'
 import { useVerge } from '@/hooks/use-verge'
 import { getProxyView, getSystemProxy } from '@/services/cmds'
 import { useQuery } from '@/services/query-client'
 import { useRunState } from '@/store/app-store-context'
+import { nodeQualityManager } from '@/store/node-quality'
 import { resolveDisplayedMixedPort } from '@/utils/mixed-port'
 
 import {
@@ -49,6 +51,7 @@ export const AppDataProvider = ({
   children: React.ReactNode
 }) => {
   const { verge } = useVerge()
+  const { profiles, current } = useProfiles()
   const { data: runtimeConfig } = useRuntimeConfig()
   const { clashInfo } = useClashInfo()
 
@@ -98,6 +101,15 @@ export const AppDataProvider = ({
   const runState = useRunState()
   const isRunningModePending = runState == null
   const runningMode = runState?.mode
+  const qualityProfile = JSON.stringify([profiles?.current, current?.updated])
+
+  useLayoutEffect(() => {
+    nodeQualityManager.update(
+      proxyView,
+      qualityProfile,
+      Boolean(runState && runState.mode !== 'NotRunning' && !proxyViewError),
+    )
+  }, [proxyView, qualityProfile, runState, proxyViewError])
 
   const refreshProxy = useStableFn(_refetchProxyView)
   const refreshClashConfig = useStableFn(_refetchClashConfig)

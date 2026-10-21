@@ -5,6 +5,7 @@ vi.mock('tauri-plugin-mihomo-api', () => ({
   healthcheckNodeInProvider: vi.fn(async () => ({ delay: 120 })),
 }))
 
+import { nodeQualityManager } from '@/store/node-quality'
 import type { ResolvedProxyMember } from '@/types/proxy-view'
 
 import delayManager from './delay'
@@ -27,6 +28,9 @@ let settles = 0
 let unsubscribe: () => void
 
 beforeEach(() => {
+  vi.spyOn(nodeQualityManager, 'refresh').mockImplementation(
+    () => new Promise<void>(() => {}),
+  )
   settles = 0
   unsubscribe = delayManager.addGroupListener('g', () => {
     settles += 1
@@ -43,6 +47,7 @@ describe('group delay completion', () => {
     await flush()
 
     expect(settles).toBe(1)
+    expect(nodeQualityManager.refresh).toHaveBeenCalledWith(proxies)
   })
 
   test('notifies only listeners for the completed group', async () => {
@@ -51,11 +56,13 @@ describe('group delay completion', () => {
       other += 1
     })
 
-    await delayManager.checkDelay(node('a') as never, 'g', 5000)
+    const selected = node('a')
+    await delayManager.checkDelay(selected as never, 'g', 5000)
     await flush()
 
     expect(settles).toBe(1)
     expect(other).toBe(0)
+    expect(nodeQualityManager.refresh).toHaveBeenCalledWith([selected])
     stop()
   })
 })

@@ -4,6 +4,7 @@ import {
   type ProxyDelay,
 } from 'tauri-plugin-mihomo-api'
 
+import { nodeQualityManager } from '@/store/node-quality'
 import {
   memberDetails,
   providerNameOf,
@@ -298,6 +299,7 @@ class DelayManager {
     group: string,
     timeout: number,
   ): Promise<DelayUpdate> {
+    void nodeQualityManager.refresh([member])
     const update = await this.measureDelay(member, group, timeout)
     this.queueGroupNotification(group)
     return update
@@ -365,6 +367,7 @@ class DelayManager {
     debugLog(
       `[DelayManager] 批量测试延迟开始，组: ${group}, 数量: ${proxies.length}, 并发数: ${concurrency}`,
     )
+    void nodeQualityManager.refresh(proxies)
     this.activeBatches.set(group, (this.activeBatches.get(group) ?? 0) + 1)
     proxies.forEach((member) => {
       this.setDelay(member, group, -2)

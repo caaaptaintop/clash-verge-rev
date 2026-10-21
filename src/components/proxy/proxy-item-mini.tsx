@@ -11,6 +11,8 @@ import {
   type ResolvedProxyMember,
 } from '@/types/proxy-view'
 
+import { NodeQuality } from './node-quality'
+
 interface Props {
   group: ProxyGroupView
   member: ResolvedProxyMember
@@ -44,7 +46,7 @@ export const ProxyItemMini = (props: Props) => {
       onClick={unresolved ? undefined : () => onClick?.(member)}
       sx={[
         {
-          height: 56,
+          minHeight: 136,
           borderRadius: 1.5,
           pl: 1.5,
           pr: 1,
@@ -81,7 +83,7 @@ export const ProxyItemMini = (props: Props) => {
         },
       ]}
     >
-      <Box title={`${name}\n${now ?? ''}`} sx={{ overflow: 'hidden' }}>
+      <Box title={`${name}\n${now ?? ''}`} sx={{ minWidth: 0, flex: 1 }}>
         <Typography
           variant="body2"
           component="div"
@@ -153,9 +155,15 @@ export const ProxyItemMini = (props: Props) => {
             )}
           </Box>
         )}
+        <NodeQuality member={member} />
       </Box>
       <Box
-        sx={{ ml: 0.5, color: 'primary.main', display: isPreset ? 'none' : '' }}
+        sx={{
+          ml: 0.5,
+          flexShrink: 0,
+          color: 'primary.main',
+          display: isPreset ? 'none' : '',
+        }}
       >
         {!unresolved && delayValue === -2 && (
           <Widget>

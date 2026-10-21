@@ -11,7 +11,7 @@ import {
   SortByAlphaRounded,
   SortRounded,
 } from '@mui/icons-material'
-import { Box, IconButton, type SxProps } from '@mui/material'
+import { Box, Button, IconButton, type SxProps } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -19,6 +19,7 @@ import { BaseSearchBox } from '@/components/base'
 import { useVerge } from '@/hooks/use-verge'
 import delayManager from '@/services/delay'
 import { showNotice } from '@/services/notice-service'
+import { nodeQualityManager } from '@/store/node-quality'
 import { debugLog } from '@/utils/debug'
 import { isValidLatencyTestUrl } from '@/utils/network'
 
@@ -81,6 +82,18 @@ export const ProxyHead = ({
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ...sx }}>
+      <Button
+        size="small"
+        title="刷新本组实际节点的 IP质量（独立于延迟测速）"
+        sx={{ flexShrink: 0, minWidth: 56 }}
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          void nodeQualityManager.refreshGroup(groupName)
+        }}
+      >
+        IP质量
+      </Button>
       <IconButton
         size="small"
         color="inherit"

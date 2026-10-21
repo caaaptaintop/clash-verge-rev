@@ -9,7 +9,7 @@ import VisibilityOffRounded from '@mui/icons-material/VisibilityOffRounded'
 import VisibilityRounded from '@mui/icons-material/VisibilityRounded'
 import WifiTetheringOffRounded from '@mui/icons-material/WifiTetheringOffRounded'
 import WifiTetheringRounded from '@mui/icons-material/WifiTetheringRounded'
-import { Box, IconButton, type SxProps } from '@mui/material'
+import { Box, Button, IconButton, type SxProps } from '@mui/material'
 import { useDebounceFn } from 'ahooks'
 import { memo, useEffect, useRef } from 'react'
 import { flushSync } from 'react-dom'
@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 import { useVerge } from '@/hooks/use-verge'
 import delayManager from '@/services/delay'
 import { showNotice } from '@/services/notice-service'
+import { nodeQualityManager } from '@/store/node-quality'
 import { isValidLatencyTestUrl } from '@/utils/network'
 
 import { BaseSearchBox, type SearchState } from '../base'
@@ -151,6 +152,18 @@ export const ProxyGroupTools = memo(function ProxyGroupTools(props: Props) {
       }}
     >
       {side === 'right' && textInput}
+      <Button
+        size="small"
+        title="刷新本组实际节点的 IP质量（独立于延迟测速）"
+        sx={{ flexShrink: 0, minWidth: 56 }}
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          void nodeQualityManager.refreshGroup(groupName)
+        }}
+      >
+        IP质量
+      </Button>
       <IconButton
         size="small"
         color="inherit"

@@ -220,6 +220,8 @@ mod app_init {
             cmd::get_unlock_items,
             cmd::check_media_unlock,
             cmd::check_media_unlock_item,
+            cmd::get_node_quality_context,
+            cmd::check_node_quality,
         ]
     }
 }

@@ -18,6 +18,7 @@ import {
 } from '@/services/cmds'
 import { mutate } from '@/services/mutate'
 import { showNotice } from '@/services/notice-service'
+import { nodeQualityManager } from '@/store/node-quality'
 import { debugLog } from '@/utils/debug'
 
 const MODES = ['rule', 'global', 'direct'] as const
@@ -161,6 +162,16 @@ const ProxyPage = () => {
       }
       header={
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Button
+            size="small"
+            variant="outlined"
+            title="刷新全部实际节点的 IP质量，并发 2；不切换当前代理"
+            onClick={() => {
+              void nodeQualityManager.refreshAll()
+            }}
+          >
+            IP质量
+          </Button>
           <ProviderButton />
 
           <ButtonGroup size="small">

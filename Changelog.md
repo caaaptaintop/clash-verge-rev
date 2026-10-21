@@ -34,6 +34,7 @@
 <details>
 <summary><strong> ✨ 新增功能 </strong></summary>
 
+- 新增逐节点 IPPure 风险评分、住宅与原生分类及风险颜色条，检测不切换日常代理
 - 新增系统托盘代理组中的「测试延迟」菜单项
 
 </details>

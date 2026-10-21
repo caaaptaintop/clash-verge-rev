@@ -528,7 +528,7 @@ const resolveServicePermission = async () => {
           continue
         }
         try {
-          execSync(`chmod 755 ${filePath}`)
+          execFileSync('chmod', ['755', filePath])
           log_success(`chmod finished: "${filePath}"`)
         } catch (e) {
           log_error(`chmod failed for ${filePath}:`, e.message)

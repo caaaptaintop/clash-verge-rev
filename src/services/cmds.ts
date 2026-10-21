@@ -7,6 +7,32 @@ import { showNotice } from '@/services/notice-service'
 import type { ProxyViewV1 } from '@/types/proxy-view'
 import { debugLog } from '@/utils/debug'
 
+export interface NodeQualityReport {
+  ip: string
+  fraudScore: number | null
+  isResidential: boolean | null
+  isBroadcast: boolean | null
+  countryCode: string
+  asOrganization: string
+  asn: number | null
+  checkedAt: string
+  generation: string
+}
+
+export function getNodeQualityContext(): Promise<string> {
+  return invoke<string>('get_node_quality_context')
+}
+
+export function checkNodeQuality(
+  recordId: string,
+  generation: string,
+): Promise<NodeQualityReport> {
+  return invoke<NodeQualityReport>('check_node_quality', {
+    recordId,
+    generation,
+  })
+}
+
 export async function copyClashEnv() {
   return invoke<void>('copy_clash_env')
 }

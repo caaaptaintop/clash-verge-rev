@@ -251,7 +251,7 @@ function ChainProxyGroups(props: {
   const virtualizer = useVirtualizer({
     count: renderList.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 56,
+    estimateSize: () => 144,
     overscan: 15,
     getItemKey: (index) => renderList[index]?.key ?? index,
     rangeExtractor,
@@ -598,7 +598,7 @@ function NormalProxyGroups(props: { mode: string }) {
           isGroupItem={(item) => item.type === 0}
           getItemKey={(item) => item.key}
           estimateGroupItemHeight={76}
-          estimateItemHeight={64}
+          estimateItemHeight={144}
           renderGroupItem={renderGroupItem}
           renderItem={renderProxyItem}
         />

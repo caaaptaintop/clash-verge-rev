@@ -294,12 +294,12 @@ export const ProxyRender = memo(function ProxyRender(props: RenderProps) {
     return (
       <Box
         sx={{
-          height: 56,
+          minHeight: 136,
           display: 'grid',
           my: 0.5,
           gap: 1,
           px: 2,
-          gridTemplateColumns: `repeat(${item.col! || 2}, 1fr)`,
+          gridTemplateColumns: `repeat(${item.col! || 2}, minmax(0, 1fr))`,
         }}
       >
         {memberColItemsMemo}
