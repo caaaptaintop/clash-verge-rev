@@ -23,6 +23,12 @@
 
 本项目由 [caaaptaintop](https://github.com/caaaptaintop/clash-verge-rev) 维护，来源于 [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)，以其稳定版 **v2.5.8** 为基线，维护分支为 **`feat/ip-quality`**。主要新增逐节点 IP 质量检测与展示；本 fork 与上游独立发布。
 
+## 增强版界面示意
+
+下图基于本机增强版界面制作，订阅名称及相关标识已替换为中性文字。分数为截图时的检测结果，仅用于展示评分、色带和节点属性，实际结果以检测时返回的数据为准。点击图片可查看原图。
+
+![IP质量增强版脱敏界面示意：逐节点风险评分、六档色带与节点属性](./docs/preview_ip_quality.png)
+
 ## 下载与安装
 
 **增强版请从[本 fork 的 Releases](https://github.com/caaaptaintop/clash-verge-rev/releases) 下载。** 上游发布的安装包不包含本 fork 的 IP 质量增强功能。
@@ -62,14 +68,6 @@
 | >70–100 | 极度风险 | 红色 |
 
 评分是第三方提供的参考信息，不是节点可用性、速度、匿名性或特定网站 / 服务可访问性的承诺。检测会经受测节点请求 `my.ippure.com`，第三方服务因此能看到该节点的出口 IP；新增检测请求不上传订阅内容或节点凭据，详见下方隐私说明。
-
-## 上游界面预览
-
-以下为上游界面示意，未展示本 fork 新增的 IP 质量信息。
-
-| 深色模式 | 浅色模式 |
-| --- | --- |
-| ![预览](./docs/preview_dark.png) | ![预览](./docs/preview_light.png) |
 
 通用安装说明和常见问题可参考[上游文档](https://clash-verge-rev.github.io/)，其中下载与更新说明不适用于本 fork 增强包。
 
